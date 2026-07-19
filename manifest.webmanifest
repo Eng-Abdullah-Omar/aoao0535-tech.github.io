@@ -1,16 +1,12 @@
 {
-  "name": "مكتبتي التدريبية",
-  "short_name": "الدورات",
+  "name": "مكتبة عبدالله التعليمية",
+  "short_name": "دورات عبدالله",
+  "description": "صفحة تجمع دورات عبدالله التدريبية في رابط واحد.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#080d17",
-  "theme_color": "#0b1220",
+  "background_color": "#f7f6f2",
+  "theme_color": "#0d1b2a",
   "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

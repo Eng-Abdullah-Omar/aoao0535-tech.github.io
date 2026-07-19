@@ -3,110 +3,140 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="بوابة موحدة للوصول إلى الدورات التدريبية." />
-  <title>مكتبتي التدريبية</title>
+  <meta name="theme-color" content="#0d1b2a" />
+  <meta name="description" content="مكتبة عبدالله التعليمية — صفحة تجمع دوراته التدريبية في الجودة والتدقيق وتحسين الأداء." />
+  <meta property="og:title" content="مكتبة عبدالله التعليمية" />
+  <meta property="og:description" content="دورات تدريبية في الجودة، التدقيق، وتحسين الأداء." />
+  <meta property="og:type" content="website" />
+  <title>مكتبة عبدالله التعليمية</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <script src="courses.js" defer></script>
   <script src="app.js" defer></script>
 </head>
-<body>
-  <a class="skip-link" href="#courses">انتقل إلى الدورات</a>
+<body id="top">
+  <a class="skip-link" href="#courses" data-i18n="skip">انتقل إلى الدورات</a>
 
   <header class="site-header">
-    <div class="container header-row">
-      <a class="brand" href="./" aria-label="الصفحة الرئيسية">
-        <span class="brand-mark" aria-hidden="true">A</span>
-        <span>
-          <strong data-i18n="brand">مكتبتي التدريبية</strong>
-          <small data-i18n="brandSub">كل دوراتك في مكان واحد</small>
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="الصفحة الرئيسية">
+        <span class="brand-mark" id="brandMark" aria-hidden="true">ع</span>
+        <span class="brand-copy">
+          <strong data-i18n="brand">مكتبة عبدالله التعليمية</strong>
+          <small data-i18n="brandSub">دوراتي التدريبية</small>
         </span>
       </a>
 
+      <nav class="main-nav" aria-label="التنقل الرئيسي">
+        <a href="#courses" data-i18n="navCourses">الدورات</a>
+      </nav>
+
       <div class="header-actions">
-        <button id="languageButton" class="icon-button text-button" type="button" aria-label="تغيير اللغة">
-          <span aria-hidden="true">EN</span>
-        </button>
-        <button id="themeButton" class="icon-button" type="button" aria-label="تبديل الوضع الليلي">
-          <span id="themeIcon" aria-hidden="true">◐</span>
+        <button id="languageButton" class="icon-button language-button" type="button" aria-label="تغيير اللغة">EN</button>
+        <button id="themeButton" class="icon-button" type="button" aria-label="تبديل المظهر">
+          <span id="themeIcon" aria-hidden="true"></span>
         </button>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <span class="eyebrow" data-i18n="eyebrow">بوابة التعلّم الخاصة بك</span>
-          <h1 data-i18n="heroTitle">رابط واحد، وكل دوراتك أمامك.</h1>
-          <p data-i18n="heroText">اختر الدورة التي تريد متابعتها. عند إنشاء دورة جديدة، تُضاف هنا بدون تغيير روابط الدورات السابقة.</p>
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+
+      <div class="container hero-layout">
+        <div class="hero-content">
+          <span class="eyebrow" data-i18n="eyebrow">ABDULLAH · COURSE LIBRARY</span>
+          <h1 id="heroTitle" data-i18n="heroTitle">دوراتي التدريبية في الجودة والتدقيق وتحسين الأداء</h1>
+          <p class="hero-text" data-i18n="heroText">هذه الصفحة تجمع الدورات التي أعددتها في مكان واحد، مع روابط مباشرة لكل مسار تدريبي.</p>
+
           <div class="hero-actions">
-            <a class="primary-button" href="#courses" data-i18n="browseCourses">استعرض الدورات</a>
-            <span class="course-count" id="courseCount" aria-live="polite"></span>
+            <a class="button button-primary" href="#courses">
+              <span data-i18n="viewCourses">عرض الدورات</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+            </a>
+            <button id="shareButton" class="button button-secondary" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/></svg>
+              <span data-i18n="sharePage">مشاركة الصفحة</span>
+            </button>
+          </div>
+
+          <div class="hero-meta">
+            <span><strong id="courseCount">0</strong><small data-i18n="courseCountLabel">دورات متاحة</small></span>
+            <i aria-hidden="true"></i>
+            <span><strong>AR / EN</strong><small data-i18n="languagesLabel">باللغتين</small></span>
+            <i aria-hidden="true"></i>
+            <span><strong data-i18n="directAccessValue">مباشر</strong><small data-i18n="directAccessLabel">وصول للدورات</small></span>
           </div>
         </div>
 
-        <div class="hero-panel" aria-hidden="true">
-          <div class="panel-top">
-            <span></span><span></span><span></span>
+        <aside class="profile-card" aria-label="بطاقة صاحب المكتبة">
+          <div class="profile-card-top">
+            <span class="profile-label" data-i18n="profileLabel">صاحب المكتبة</span>
+            <span class="profile-status"><i aria-hidden="true"></i><span data-i18n="profileStatus">محدّثة</span></span>
           </div>
-          <div class="panel-content">
-            <div class="mini-card large"></div>
-            <div class="mini-row">
-              <div class="mini-card"></div>
-              <div class="mini-card"></div>
+          <div class="profile-identity">
+            <span class="profile-avatar" id="profileAvatar" aria-hidden="true">ع</span>
+            <div>
+              <strong data-i18n="ownerName">عبدالله</strong>
+              <span data-i18n="ownerRole">إعداد وتطوير المحتوى التدريبي</span>
             </div>
-            <div class="progress-line"><span></span></div>
           </div>
-        </div>
+          <div class="profile-focus">
+            <small data-i18n="focusLabel">مجالات الدورات</small>
+            <div class="focus-tags">
+              <span data-i18n="focusQuality">إدارة الجودة</span>
+              <span data-i18n="focusAudit">التدقيق</span>
+              <span data-i18n="focusImprovement">تحسين العمليات</span>
+            </div>
+          </div>
+          <div class="profile-courses" id="profileCourses"></div>
+        </aside>
       </div>
     </section>
 
     <section id="courses" class="courses-section" aria-labelledby="coursesTitle">
       <div class="container">
-        <div class="section-heading">
+        <div class="section-header">
           <div>
-            <span class="eyebrow" data-i18n="library">مكتبة الدورات</span>
-            <h2 id="coursesTitle" data-i18n="coursesTitle">اختر مسارك التدريبي</h2>
+            <span class="section-number">01</span>
+            <div>
+              <span class="section-kicker" data-i18n="coursesKicker">COURSES</span>
+              <h2 id="coursesTitle" data-i18n="coursesTitle">الدورات المتاحة</h2>
+              <p data-i18n="coursesText">اختر الدورة لفتح محتواها مباشرة.</p>
+            </div>
           </div>
+
           <label class="search-box">
-            <span class="sr-only" data-i18n="searchLabel">ابحث عن دورة</span>
-            <span aria-hidden="true">⌕</span>
-            <input id="courseSearch" type="search" autocomplete="off" placeholder="ابحث عن دورة..." data-i18n-placeholder="searchPlaceholder" />
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16.2 16.2 4 4"/></svg>
+            <span class="sr-only" data-i18n="searchLabel">ابحث في الدورات</span>
+            <input id="courseSearch" type="search" autocomplete="off" placeholder="ابحث في الدورات..." data-i18n-placeholder="searchPlaceholder" />
           </label>
         </div>
 
         <div id="courseGrid" class="course-grid" aria-live="polite"></div>
-        <p id="emptyState" class="empty-state" hidden data-i18n="emptyState">لا توجد دورة مطابقة لبحثك.</p>
-      </div>
-    </section>
-
-    <section class="how-section">
-      <div class="container how-card">
-        <div>
-          <span class="eyebrow" data-i18n="futureEyebrow">مصممة للمستقبل</span>
-          <h2 data-i18n="futureTitle">إضافة الدورات الجديدة سهلة</h2>
-          <p data-i18n="futureText">كل الدورات تُدار من ملف واحد اسمه courses.js. أضف بيانات الدورة والرابط، وستظهر بطاقة جديدة تلقائيًا.</p>
-        </div>
-        <div class="code-sample" dir="ltr" aria-label="مثال إضافة دورة">
-          <code>{ titleAr: "دورة جديدة", url: "/new-course/" }</code>
+        <div id="emptyState" class="empty-state" hidden>
+          <span aria-hidden="true">⌕</span>
+          <strong data-i18n="emptyTitle">لا توجد دورة مطابقة</strong>
+          <p data-i18n="emptyText">جرّب كلمة بحث مختلفة.</p>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-row">
-      <p><span data-i18n="footer">مكتبتي التدريبية</span> <span id="year"></span></p>
-      <a href="#top" data-i18n="backTop">العودة للأعلى</a>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="footer-mark" id="footerMark" aria-hidden="true">ع</span>
+        <span><strong data-i18n="footerTitle">مكتبة عبدالله التعليمية</strong><small data-i18n="footerText">جميع دوراتي في رابط واحد.</small></span>
+      </div>
+      <p>© <span id="year"></span> <span data-i18n="footerOwner">عبدالله</span></p>
     </div>
   </footer>
 
-  <noscript>
-    <div class="noscript">يلزم تفعيل JavaScript لعرض قائمة الدورات.</div>
-  </noscript>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
