@@ -2,27 +2,49 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#102b4e">
-<title>دورة ASQ CQE التحضيرية الشاملة</title>
-<meta name="description" content="دورة عربية تفصيلية للتحضير لاختبار ASQ Certified Quality Engineer CQE اعتمادًا على مراجع ASQ الرسمية">
-<link rel="stylesheet" href="styles.css">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b3a53">
+<meta name="description" content="Comprehensive bilingual Arabic-English ASQ CQE exam preparation course">
+<title>ASQ CQE Academy | الأكاديمية ثنائية اللغة</title>
+<link rel="stylesheet" href="v2/styles.css">
 </head>
-<body id="top">
-<header><div class="wrap hero">
-<div><span class="badge">ASQ CQE EXAM PREPARATION</span><h1>دورة مهندس الجودة المعتمد CQE</h1><p class="lead">شرح عربي تفصيلي مبني على هيكل ASQ CQE Body of Knowledge، مع المصطلحات الإنجليزية، التطبيقات الصناعية، المعادلات، والفخاخ الاختبارية.</p><div class="notice">مادة تحضيرية مستقلة وليست دورة أو شهادة صادرة عن ASQ. الشرح مكتوب بصياغة أصلية، والمرجع النهائي للاختبار هو الـBody of Knowledge الرسمي الساري وقت التسجيل.</div></div>
-<div class="hero-card"><small>النسخة الموسعة من مراجع ASQ</small><strong id="lessonCount">جارٍ التحميل</strong><p>7 محاور رسمية<br>دروس تعمق تحليلية<br>أمثلة ومسائل وفخاخ اختبارية<br>حفظ التقدم والبحث</p></div>
-</div></header>
-<nav><div class="wrap nav-inner"><a href="#top">الرئيسية</a><a href="#outline">المحاور</a><a href="#exam">الاختبارات</a><a href="#references">المراجع</a><button onclick="toggleAll(true)">فتح الكل</button><button onclick="toggleAll(false)">إغلاق الكل</button><button onclick="window.print()">طباعة / PDF</button><div class="progress-box"><small id="progressText">التقدم 0%</small><progress id="progress" value="0" max="100"></progress></div></div></nav>
-<main class="wrap">
-<section class="intro-grid"><div class="info"><b>المرجع الأساسي</b>The ASQ Certified Quality Engineer Handbook، النسخة الخامسة لتحديث النطاق والرابعة الكاملة للشرح</div><div class="info"><b>طريقة المذاكرة</b>اقرأ الشرح، حل المثال بنفسك، راجع الفخ الاختباري، ثم أجب عن أسئلة المحور</div><div class="info"><b>التركيز الأعلى</b>الطرق الكمية، SPC، القدرة، DOE، MSA، الاعتمادية وأخذ العينات</div></section>
-<section class="notice"><b>توزيع الأسئلة المحتسبة حسب 2022 CQE BoK</b><div class="dist"><div>I<br><b>17</b></div><div>II<br><b>18</b></div><div>III<br><b>21</b></div><div>IV<br><b>23</b></div><div>V<br><b>26</b></div><div>VI<br><b>34</b></div><div>VII<br><b>21</b></div></div></section>
-<section class="study-tools"><div><label for="courseSearch"><b>البحث داخل الدورة</b></label><input id="courseSearch" type="search" placeholder="مثال: Cpk أو التدقيق أو FMEA"></div><div id="searchResult" class="search-result"></div></section>
-<section id="outline"><h2>فهرس المحاور</h2><div class="toc"><button class="toc-btn" data-target="module-1"><span>1</span><b>الإدارة والقيادة</b><small>Management & Leadership</small></button><button class="toc-btn" data-target="module-2"><span>2</span><b>نظام الجودة</b><small>The Quality System</small></button><button class="toc-btn" data-target="module-3"><span>3</span><b>تصميم المنتج والعملية والخدمة</b><small>Design</small></button><button class="toc-btn" data-target="module-4"><span>4</span><b>ضبط المنتج والعملية</b><small>Control</small></button><button class="toc-btn" data-target="module-5"><span>5</span><b>التحسين المستمر</b><small>Improvement</small></button><button class="toc-btn" data-target="module-6"><span>6</span><b>الطرق الكمية والأدوات</b><small>Quantitative</small></button><button class="toc-btn" data-target="module-7"><span>7</span><b>إدارة المخاطر</b><small>Risk Management</small></button></div></section>
-<div id="modules"><p>جارٍ تحميل المحتوى التفصيلي...</p></div>
-<section class="exam" id="exam"><h2>الاختبارات التدريبية</h2><p>الأسئلة أصلية تعليمية وليست أسئلة ASQ الفعلية. استخدم الاختبار لتحديد نقاط الضعف، وليس كبديل عن مسائل الكتاب وبنك ASQ الرسمي.</p><div class="exam-controls"><button class="primary" onclick="buildQuiz(20)">اختبار سريع 20 سؤالًا</button><button class="primary" onclick="buildQuiz(999)">كامل البنك الحالي</button><button class="primary" onclick="grade()">تصحيح</button></div><div id="examMeta" class="exam-summary"></div><div id="quiz"></div><h3 id="score"></h3></section>
-<section class="exam" id="references"><h2>المراجع المستخدمة</h2><ol><li><b>The ASQ Certified Quality Engineer Handbook, Fifth Edition</b> — لتحديث 2022 Body of Knowledge، توزيع المحاور، والمحتوى الجديد مثل RACI، Cost–Benefit Analysis، CTQ، OEE، 5 Whys، Data Automation، والفصل المستقل لإدارة المخاطر.</li><li><b>The Certified Quality Engineer Handbook, Fourth Edition</b> — للشرح التفصيلي والأمثلة والمعادلات والجداول في الفصول السبعة والملاحق الإحصائية.</li><li><b>ASQ CQE Body of Knowledge</b> — لتحديد مستوى الإدراك المطلوب: Understand، Apply، Analyze، Evaluate.</li></ol><p>لا ينشر الموقع نصوص الكتب أو صفحاتها. المحتوى شرح أصلي مستند إلى الموضوعات والمفاهيم الواردة في المراجع.</p></section>
+<body>
+<header class="topbar">
+  <a class="brand" href="#home" data-tab="home">
+    <span class="logo">CQE</span>
+    <span><strong id="brandTitle"></strong><small id="brandSubtitle"></small></span>
+  </a>
+  <div class="top-actions">
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Theme">◐</button>
+    <button id="langBtn" class="lang-btn" type="button"></button>
+  </div>
+</header>
+<nav class="main-nav" id="mainNav"></nav>
+
+<main class="shell">
+  <section id="home" class="page active"></section>
+
+  <section id="lessons" class="page">
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <div class="search-wrap">
+          <input id="lessonSearch" type="search" autocomplete="off">
+        </div>
+        <div id="domainList" class="domain-list"></div>
+        <div id="lessonList" class="lesson-list"></div>
+      </aside>
+      <article id="lessonView" class="lesson-view"></article>
+    </div>
+  </section>
+
+  <section id="tools" class="page"></section>
+  <section id="cards" class="page"></section>
+  <section id="practice" class="page"></section>
+  <section id="references" class="page"></section>
 </main>
-<footer>دورة تحضيرية مستقلة لمهندس الجودة المعتمد CQE — للمذاكرة والتطوير المهني.</footer>
-<script src="data/module1.js"></script><script src="data/module2.js"></script><script src="data/module3.js"></script><script src="data/module4.js"></script><script src="data/module5.js"></script><script src="data/module6.js"></script><script src="data/module7.js"></script><script src="data/deepdives.js"></script><script src="app.js"></script>
-</body></html>
+
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<script src="v2/c00.js"></script><script src="v2/c01.js"></script><script src="v2/c02.js"></script><script src="v2/c03.js"></script><script src="v2/c04.js"></script><script src="v2/c05.js"></script><script src="v2/c06.js"></script><script src="v2/c07.js"></script><script src="v2/c08.js"></script><script src="v2/c09.js"></script><script src="v2/c10.js"></script><script src="v2/c11.js"></script><script src="v2/p12.js"></script><script src="v2/p14.js"></script><script src="v2/q16.js"></script><script src="v2/q20.js"></script><script src="v2/q24.js"></script><script src="v2/q28.js"></script><script src="v2/q32.js"></script><script src="v2/q36.js"></script><script src="v2/loader40.js"></script>
+</body>
+</html>
