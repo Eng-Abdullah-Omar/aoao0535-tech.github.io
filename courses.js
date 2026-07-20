@@ -43,5 +43,28 @@ window.COURSES = [
     accentSoft: "#e9edff",
     accentDark: "#173179",
     status: "available"
+  },
+  {
+    id: "asq-cqe-preparation",
+    number: "03",
+    titleAr: "دورة مهندس الجودة المعتمد CQE",
+    titleEn: "Certified Quality Engineer CQE Preparation",
+    shortTitleAr: "ASQ CQE",
+    shortTitleEn: "ASQ CQE",
+    descriptionAr: "دورة عربية شاملة للتحضير لاختبار مهندس الجودة المعتمد، تشمل أنظمة الجودة، التصميم، ضبط العمليات، التحسين، الإحصاء وإدارة المخاطر.",
+    descriptionEn: "A comprehensive Arabic preparation course covering quality systems, design, process control, improvement, statistics, and risk management.",
+    categoryAr: "هندسة الجودة",
+    categoryEn: "Quality Engineering",
+    tagsAr: ["7 محاور", "27 درسًا", "80 سؤالًا"],
+    tagsEn: ["7 domains", "27 lessons", "80 questions"],
+    languageAr: "عربي مع المصطلحات الإنجليزية",
+    languageEn: "Arabic with English terminology",
+    lessons: 27,
+    url: "https://aoao0535-tech.github.io/cqe/",
+    symbol: "Q",
+    accent: "#d6a847",
+    accentSoft: "#fff6dc",
+    accentDark: "#72530e",
+    status: "available"
   }
 ];
