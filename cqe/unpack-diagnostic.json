@@ -5,10 +5,11 @@
   "packed_suffix": "XW3if/9/E8uZwN6IBAA=",
   "truncated_gzip_bytes": 91710,
   "javascript_bytes_recovered": 297284,
-  "gzip_eof_before_repair": false,
-  "existing_trailer_prefix_hex": "67037a201000",
-  "expected_trailer_hex": "eb82746944890400",
-  "error_type": "RuntimeError",
-  "error": "The recovered gzip trailer does not match CRC/size; payload is damaged before its final two bytes",
-  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 76, in <module>\nRuntimeError: The recovered gzip trailer does not match CRC/size; payload is damaged before its final two bytes\n"
+  "gzip_eof": false,
+  "unused_data_bytes": 0,
+  "unconsumed_tail_bytes": 0,
+  "javascript_tail_hex": "497d2c22616e733d73b92088ad65207375536561a365737374726561766420617576d8a829617576d8b4b865d8a8b179a320d982d8af6e7373576c6f64866173",
+  "error_type": "UnicodeDecodeError",
+  "error": "'utf-8' codec can't decode byte 0xd8 in position 251951: invalid continuation byte",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 67, in <module>\nUnicodeDecodeError: 'utf-8' codec can't decode byte 0xd8 in position 251951: invalid continuation byte\n"
 }
