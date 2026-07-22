@@ -1,38 +1,14 @@
 {
   "status": "FAILED",
-  "attempts": [
-    {
-      "name": "grouped_original",
-      "characters": 122281,
-      "mod4": 1,
-      "equals_count": 1,
-      "first_equals": 122280,
-      "compressed_bytes": 91710,
-      "status": "FAILED",
-      "error_type": "EOFError",
-      "error": "Compressed file ended before the end-of-stream marker was reached"
-    },
-    {
-      "name": "corrected_chunk33",
-      "characters": 122281,
-      "mod4": 1,
-      "equals_count": 1,
-      "first_equals": 122280,
-      "compressed_bytes": 91710,
-      "status": "FAILED",
-      "error_type": "EOFError",
-      "error": "Compressed file ended before the end-of-stream marker was reached"
-    }
-  ],
-  "chunk33": {
-    "grouped_length": 3057,
-    "grouped_prefix": "miRs9xrqDX8x58w7",
-    "grouped_suffix": "PYlnT7pc4ly0BtOz",
-    "corrected_length": 3057,
-    "corrected_prefix": "miRs9xrqDX8x58w7",
-    "corrected_suffix": "PYlnT7pc4ly0BtOz"
-  },
+  "packed_characters": 122281,
+  "packed_mod4": 1,
+  "packed_suffix": "XW3if/9/E8uZwN6IBAA=",
+  "truncated_gzip_bytes": 91710,
+  "javascript_bytes_recovered": 297284,
+  "gzip_eof_before_repair": false,
+  "existing_trailer_prefix_hex": "67037a201000",
+  "expected_trailer_hex": "eb82746944890400",
   "error_type": "RuntimeError",
-  "error": "Neither the grouped nor corrected chunk-33 payload is valid",
-  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 106, in <module>\nRuntimeError: Neither the grouped nor corrected chunk-33 payload is valid\n"
+  "error": "The recovered gzip trailer does not match CRC/size; payload is damaged before its final two bytes",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 76, in <module>\nRuntimeError: The recovered gzip trailer does not match CRC/size; payload is damaged before its final two bytes\n"
 }
