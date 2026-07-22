@@ -50,3 +50,77 @@ jobs:
 
           console.log(`Validated ${domains.length} domains and ${lessons} lessons.`);
           NODE
+
+      - name: Install browser test dependency
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Run CQE browser smoke test
+        shell: bash
+        run: |
+          python3 -m http.server 4173 >/tmp/cqe-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+
+          node <<'NODE'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
+            const browserErrors = [];
+            const requestFailures = [];
+
+            page.on('console', message => {
+              console.log(`[browser:${message.type()}] ${message.text()}`);
+            });
+            page.on('pageerror', error => {
+              browserErrors.push(error.stack || error.message);
+              console.error(`[pageerror] ${error.stack || error.message}`);
+            });
+            page.on('requestfailed', request => {
+              requestFailures.push(`${request.url()} — ${request.failure()?.errorText || 'failed'}`);
+            });
+
+            try {
+              const response = await page.goto(
+                'http://127.0.0.1:4173/cqe/latest.html?v=ci',
+                { waitUntil: 'networkidle', timeout: 30000 }
+              );
+
+              if (!response || !response.ok()) {
+                throw new Error(`Course page returned HTTP ${response?.status() || 'no response'}`);
+              }
+
+              await page.waitForFunction(
+                () => Boolean(window.CQE && document.querySelector('#home h1')),
+                { timeout: 20000 }
+              );
+
+              const result = await page.evaluate(() => ({
+                hasApp: Boolean(window.CQE),
+                homeTitle: document.querySelector('#home h1')?.textContent?.trim() || '',
+                domains: Array.isArray(window.CQE_DOMAINS) ? window.CQE_DOMAINS.length : 0,
+                lessons: Array.isArray(window.CQE_DOMAINS)
+                  ? window.CQE_DOMAINS.reduce((sum, domain) => sum + (domain.lessons?.length || 0), 0)
+                  : 0,
+                stillLoading: document.querySelector('#home')?.textContent?.includes('Loading course content') || false
+              }));
+
+              console.log(JSON.stringify(result, null, 2));
+
+              if (browserErrors.length) throw new Error(`Browser errors:\n${browserErrors.join('\n\n')}`);
+              if (requestFailures.length) throw new Error(`Request failures:\n${requestFailures.join('\n')}`);
+              if (!result.hasApp || result.stillLoading) throw new Error('CQE application did not replace the loading screen');
+              if (result.domains !== 7 || result.lessons !== 82) {
+                throw new Error(`Unexpected course data: ${result.domains} domains, ${result.lessons} lessons`);
+              }
+            } finally {
+              await browser.close();
+            }
+          })().catch(error => {
+            console.error(error.stack || error.message);
+            process.exit(1);
+          });
+          NODE
