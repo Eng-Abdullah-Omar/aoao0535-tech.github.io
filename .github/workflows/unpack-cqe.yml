@@ -60,8 +60,8 @@ jobs:
               if missing or extra:
                   raise RuntimeError(f'Missing chunks={missing}; extra chunks={extra}')
 
-              packed = ''.join(chunks[i] for i in range(40))
-              compressed = base64.b64decode(packed, validate=True)
+              compressed_parts = [base64.b64decode(chunks[i], validate=True) for i in range(40)]
+              compressed = b''.join(compressed_parts)
               code_bytes = gzip.decompress(compressed)
               code = code_bytes.decode('utf-8')
 
@@ -74,16 +74,21 @@ jobs:
               html = index_path.read_text(encoding='utf-8')
               html = re.sub(
                   r'<script src="v2/loader40\.js\?v=[^"]+"></script>',
-                  '<script src="v2/app-unpacked.js?v=20260722-3"></script>',
+                  '<script src="v2/app-unpacked.js?v=20260722-4"></script>',
                   html
               )
-              html = html.replace('v2/styles.css?v=20260722-2', 'v2/styles.css?v=20260722-3')
+              html = re.sub(
+                  r'<script src="v2/app-unpacked\.js\?v=[^"]+"></script>',
+                  '<script src="v2/app-unpacked.js?v=20260722-4"></script>',
+                  html
+              )
+              html = re.sub(r'v2/styles\.css\?v=[^"]+', 'v2/styles.css?v=20260722-4', html)
               index_path.write_text(html, encoding='utf-8')
 
               diagnostic = {
                   'status': 'SUCCESS',
                   'chunks': len(chunks),
-                  'base64_characters': len(packed),
+                  'base64_characters': sum(len(chunks[i]) for i in range(40)),
                   'compressed_bytes': len(compressed),
                   'javascript_bytes': len(code_bytes),
                   'output': str(output),
