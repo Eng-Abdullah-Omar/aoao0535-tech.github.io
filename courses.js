@@ -60,7 +60,7 @@ window.COURSES = [
     languageAr: "عربي مع المصطلحات الإنجليزية",
     languageEn: "Arabic with English terminology",
     lessons: 32,
-    url: "./cqe/latest.html?v=20260722-11",
+    url: "./cqe/latest.html?v=20260722-12",
     symbol: "Q",
     accent: "#d6a847",
     accentSoft: "#fff6dc",
