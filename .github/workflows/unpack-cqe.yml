@@ -37,7 +37,7 @@ jobs:
               'c00.js','c01.js','c02.js','c03.js','c04.js','c05.js',
               'c06.js','c07.js','c08.js','c09.js','c10.js','c11.js',
               'p12.js','p14.js','q16.js','q20.js','q24.js','q28.js',
-              'q32.js','q36.js'
+              'q32.js','q36.js','c37.js','c38.js','c39.js'
           ]
           diagnostic = {'status': 'FAILED'}
 
