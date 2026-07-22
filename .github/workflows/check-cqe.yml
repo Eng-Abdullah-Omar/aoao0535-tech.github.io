@@ -59,11 +59,12 @@ jobs:
       - name: Run CQE browser smoke test
         shell: bash
         run: |
+          set -o pipefail
           python3 -m http.server 4173 >/tmp/cqe-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
 
-          node <<'NODE'
+          node <<'NODE' 2>&1 | tee /tmp/cqe-browser-report.txt
           const { chromium } = require('playwright');
 
           (async () => {
@@ -80,7 +81,9 @@ jobs:
               console.error(`[pageerror] ${error.stack || error.message}`);
             });
             page.on('requestfailed', request => {
-              requestFailures.push(`${request.url()} — ${request.failure()?.errorText || 'failed'}`);
+              const detail = `${request.url()} — ${request.failure()?.errorText || 'failed'}`;
+              requestFailures.push(detail);
+              console.error(`[requestfailed] ${detail}`);
             });
 
             try {
@@ -88,6 +91,8 @@ jobs:
                 'http://127.0.0.1:4173/cqe/latest.html?v=ci',
                 { waitUntil: 'networkidle', timeout: 30000 }
               );
+
+              console.log(`[http] ${response?.status()} ${response?.url()}`);
 
               if (!response || !response.ok()) {
                 throw new Error(`Course page returned HTTP ${response?.status() || 'no response'}`);
@@ -124,3 +129,12 @@ jobs:
             process.exit(1);
           });
           NODE
+
+      - name: Upload browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cqe-browser-report
+          path: /tmp/cqe-browser-report.txt
+          if-no-files-found: warn
+          retention-days: 1
