@@ -1,6 +1,6 @@
 {
   "status": "FAILED",
   "error_type": "Error",
-  "error": "Discontinuous padding not allowed",
-  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 40, in <module>\n  File \"/usr/lib/python3.12/base64.py\", line 88, in b64decode\n    return binascii.a2b_base64(s, strict_mode=validate)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nbinascii.Error: Discontinuous padding not allowed\n"
+  "error": "Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 39, in <module>\n  File \"/usr/lib/python3.12/base64.py\", line 88, in b64decode\n    return binascii.a2b_base64(s, strict_mode=validate)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nbinascii.Error: Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4\n"
 }
