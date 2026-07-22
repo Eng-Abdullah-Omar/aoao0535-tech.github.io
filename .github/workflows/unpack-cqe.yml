@@ -7,6 +7,7 @@ on:
       - 'cqe/v2/c*.js'
       - 'cqe/v2/p*.js'
       - 'cqe/v2/q*.js'
+  pull_request:
 
 permissions:
   contents: write
@@ -106,12 +107,12 @@ jobs:
           PY
 
       - name: Commit rebuilt application
-        if: always()
+        if: always() && github.event_name == 'push'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add cqe/v2/app-unpacked.js cqe/index.html cqe/unpack-diagnostic.json 2>/dev/null || true
+          git add -A cqe
           if git diff --cached --quiet; then
             exit 0
           fi
