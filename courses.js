@@ -37,7 +37,7 @@ window.COURSES = [
     languageAr: "عربي / إنجليزي",
     languageEn: "Arabic / English",
     lessons: 44,
-    url: "https://eng-abdullah-omar.github.io/iso9001-audit-academy/?v=20260722-2",
+    url: "https://eng-abdullah-omar.github.io/iso9001-audit-academy/?v=20260722-3",
     symbol: "✓",
     accent: "#3f67e8",
     accentSoft: "#e9edff",
