@@ -48,7 +48,7 @@ const UI = {
   start:'ابدأ الدراسة',practice:'ابدأ اختبارًا',reset:'مسح التقدم',units:'وحدة',questions:'سؤال تدريبي',domains:'محاور',completed:'مكتمل',
   progress:'تقدمك في الدورة',courseMap:'خريطة المنهج',courseMapSub:'الأوزان الرسمية للأسئلة المحتسبة في اختبار CQE',
   examWeight:'سؤالًا في الاختبار',lessonsCount:'وحدات دراسية',methodTitle:'كيف تستخدم الدورة؟',
-  method:['ادرس الوحدة بالعربية أو الإنجليزية حتى تفهم الفكرة وطريقة التطبيق.','حل سؤال التحقق قبل وضع علامة الإنجاز.','كرر المسائل الإحصائية واستخدم الحاسبات للمراجعة فقط، لا بدل الفهم.','نفذ اختبار 100 سؤال بعد إكمال المحاور ثم راجع الأخطاء حسب المجال.'],
+  methodSteps:['ادرس الوحدة بالعربية أو الإنجليزية حتى تفهم الفكرة وطريقة التطبيق.','حل سؤال التحقق قبل وضع علامة الإنجاز.','كرر المسائل الإحصائية واستخدم الحاسبات للمراجعة فقط، لا بدل الفهم.','نفذ اختبار 100 سؤال بعد إكمال المحاور ثم راجع الأخطاء حسب المجال.'],
   search:'ابحث في العنوان أو الشرح أو المصطلح…',concept:'الشرح الأساسي',method:'طريقة التطبيق',example:'مثال تطبيقي',examTip:'منظور الاختبار والفخاخ',reference:'مرجع الوحدة',selfCheck:'تحقق من فهمك',check:'تحقق من الإجابة',
   correct:'إجابة صحيحة',incorrect:'الإجابة غير صحيحة',markComplete:'تمت مذاكرة الوحدة',prev:'السابق',next:'التالي',
   toolsTitle:'المعادلات والحاسبات',toolsSub:'استخدمها للتحقق بعد الحل اليدوي وفهم الافتراضات.',
@@ -74,7 +74,7 @@ const UI = {
   start:'Start studying',practice:'Start an exam',reset:'Reset progress',units:'units',questions:'practice questions',domains:'domains',completed:'completed',
   progress:'Course progress',courseMap:'Curriculum map',courseMapSub:'Official distribution of scored CQE exam questions',
   examWeight:'exam questions',lessonsCount:'study units',methodTitle:'How to use this course',
-  method:['Study each unit in Arabic or English until you understand both the concept and application.','Answer the knowledge check before marking the unit complete.','Repeat quantitative problems and use calculators only to verify manual work.','Take the 100-question mock after completing all domains, then review weaknesses by domain.'],
+  methodSteps:['Study each unit in Arabic or English until you understand both the concept and application.','Answer the knowledge check before marking the unit complete.','Repeat quantitative problems and use calculators only to verify manual work.','Take the 100-question mock after completing all domains, then review weaknesses by domain.'],
   search:'Search title, explanation, or term…',concept:'Core explanation',method:'Application method',example:'Applied example',examTip:'Exam lens and traps',reference:'Unit reference',selfCheck:'Knowledge check',check:'Check answer',
   correct:'Correct answer',incorrect:'Incorrect answer',markComplete:'I completed this unit',prev:'Previous',next:'Next',
   toolsTitle:'Formulas and calculators',toolsSub:'Use them to verify manual work after understanding assumptions.',
@@ -162,7 +162,7 @@ function renderHome(){
  <div class="actions"><button class="btn gold" onclick="window.CQE.openDomain(${state.activeDomain})">${u('start')}</button><button class="btn ghost" onclick="window.CQE.go('practice')">${u('practice')}</button><button class="btn ghost" onclick="window.CQE.resetProgress()">${u('reset')}</button></div></div>
  <div class="hero-card"><small>${u('progress')}</small><strong>${p.pct}%</strong><div class="progress-track"><div class="progress-fill" style="width:${p.pct}%"></div></div><p>${p.done} ${u('of')} ${p.total} ${u('completed')}</p></div></div></section>
  <div class="stats-grid"><div class="stat"><b>82</b><span>${u('units')}</span></div><div class="stat"><b>7</b><span>${u('domains')}</span></div><div class="stat"><b>${allQuestions.length}</b><span>${u('questions')}</span></div><div class="stat"><b>AR / EN</b><span>${state.lang==='ar'?'تبديل كامل للغة':'Complete language switch'}</span></div></div>
- <div class="section-title"><div><h2>${u('methodTitle')}</h2></div></div><div class="card"><ol>${u('method').map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>
+ <div class="section-title"><div><h2>${u('methodTitle')}</h2></div></div><div class="card"><ol>${u('methodSteps').map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>
  <div class="section-title"><div><h2>${u('courseMap')}</h2><p>${u('courseMapSub')}</p></div></div><div class="domain-grid">${domainCards}</div>`;
 }
 function resetProgress(){
