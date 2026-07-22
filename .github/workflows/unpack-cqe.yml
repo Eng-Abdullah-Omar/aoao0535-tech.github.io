@@ -85,6 +85,22 @@ jobs:
               code_bytes = gzip.decompress(compressed)
               code = code_bytes.decode('utf-8')
 
+              # The source payload contains two duplicate UI keys named "method".
+              # In JavaScript object literals the later label overwrites the earlier
+              # instruction array, which caused renderHome() to call .map() on a string.
+              replacements = [
+                  ("method:['ادرس الوحدة", "methodSteps:['ادرس الوحدة"),
+                  ("method:['Study each unit", "methodSteps:['Study each unit"),
+                  ("u('method').map", "u('methodSteps').map"),
+              ]
+              for old, new in replacements:
+                  occurrences = code.count(old)
+                  if occurrences != 1:
+                      raise RuntimeError(
+                          f'Expected exactly one CQE runtime replacement for {old!r}, found {occurrences}'
+                      )
+                  code = code.replace(old, new, 1)
+
               output = source_dir / 'app-unpacked.js'
               output.write_text(code + '\n//# sourceURL=cqe-course-app.js\n', encoding='utf-8')
 
@@ -100,7 +116,7 @@ jobs:
 
               required_markers = [
                   'brandTitle', 'brandSubtitle', 'lessonView',
-                  'domainList', 'practice', 'references'
+                  'domainList', 'practice', 'references', 'methodSteps'
               ]
               missing_markers = [marker for marker in required_markers if marker not in code]
               if missing_markers:
@@ -110,15 +126,15 @@ jobs:
               html = index_path.read_text(encoding='utf-8')
               html = re.sub(
                   r'<script src="v2/(?:loader40|app-unpacked)\.js\?v=[^"]+"></script>',
-                  '<script src="v2/app-unpacked.js?v=20260722-10"></script>',
+                  '<script src="v2/app-unpacked.js?v=20260722-12"></script>',
                   html
               )
-              html = re.sub(r'v2/styles\.css\?v=[^"]+', 'v2/styles.css?v=20260722-10', html)
+              html = re.sub(r'v2/styles\.css\?v=[^"]+', 'v2/styles.css?v=20260722-12', html)
               index_path.write_text(html, encoding='utf-8')
 
               diagnostic['status'] = 'SUCCESS'
               diagnostic['compressed_bytes'] = len(compressed)
-              diagnostic['javascript_bytes'] = len(code_bytes)
+              diagnostic['javascript_bytes'] = len(code.encode('utf-8'))
               diagnostic['output'] = str(output)
           except Exception as exc:
               diagnostic['status'] = 'FAILED'

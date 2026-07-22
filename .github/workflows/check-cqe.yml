@@ -1,0 +1,164 @@
+name: Check CQE course
+
+on:
+  pull_request:
+    paths:
+      - "cqe/**"
+      - ".github/workflows/check-cqe.yml"
+      - ".github/workflows/unpack-cqe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Apply CQE runtime repair for validation
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path('cqe/v2/app-unpacked.js')
+          code = path.read_text(encoding='utf-8')
+          replacements = [
+              ("method:['ادرس الوحدة", "methodSteps:['ادرس الوحدة"),
+              ("method:['Study each unit", "methodSteps:['Study each unit"),
+              ("u('method').map", "u('methodSteps').map"),
+          ]
+
+          for old, new in replacements:
+              if old in code:
+                  code = code.replace(old, new, 1)
+              if new not in code:
+                  raise RuntimeError(f'CQE runtime repair marker is missing: {new!r}')
+
+          path.write_text(code, encoding='utf-8')
+          PY
+
+      - name: Check JavaScript syntax
+        run: node --check cqe/v2/app-unpacked.js
+
+      - name: Validate CQE data payload
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const vm = require('node:vm');
+
+          const path = 'cqe/v2/app-unpacked.js';
+          const code = fs.readFileSync(path, 'utf8');
+          const marker = code.indexOf('\n(() => {');
+          if (marker < 0) throw new Error('CQE application marker was not found');
+
+          const context = { window: {} };
+          vm.createContext(context);
+          vm.runInContext(code.slice(0, marker), context, { filename: path });
+
+          const domains = context.window.CQE_DOMAINS;
+          const meta = context.window.CQE_META;
+          if (!meta || !Array.isArray(domains)) throw new Error('CQE metadata did not initialize');
+          if (domains.length !== 7) throw new Error(`Expected 7 domains, found ${domains.length}`);
+
+          const lessons = domains.reduce((sum, domain) => sum + (domain.lessons?.length || 0), 0);
+          if (lessons !== 82) throw new Error(`Expected 82 lessons, found ${lessons}`);
+
+          console.log(`Validated ${domains.length} domains and ${lessons} lessons.`);
+          NODE
+
+      - name: Install browser test dependency
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Run CQE browser smoke test
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 -m http.server 4173 >/tmp/cqe-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+
+          node <<'NODE' 2>&1 | tee /tmp/cqe-browser-report.txt
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
+            const browserErrors = [];
+            const requestFailures = [];
+
+            page.on('console', message => {
+              console.log(`[browser:${message.type()}] ${message.text()}`);
+            });
+            page.on('pageerror', error => {
+              browserErrors.push(error.stack || error.message);
+              console.error(`[pageerror] ${error.stack || error.message}`);
+            });
+            page.on('requestfailed', request => {
+              const detail = `${request.url()} — ${request.failure()?.errorText || 'failed'}`;
+              requestFailures.push(detail);
+              console.error(`[requestfailed] ${detail}`);
+            });
+
+            try {
+              const response = await page.goto(
+                'http://127.0.0.1:4173/cqe/latest.html?v=ci',
+                { waitUntil: 'networkidle', timeout: 30000 }
+              );
+
+              console.log(`[http] ${response?.status()} ${response?.url()}`);
+
+              if (!response || !response.ok()) {
+                throw new Error(`Course page returned HTTP ${response?.status() || 'no response'}`);
+              }
+
+              await page.waitForFunction(
+                () => Boolean(window.CQE && document.querySelector('#home h1')),
+                { timeout: 20000 }
+              );
+
+              const result = await page.evaluate(() => ({
+                hasApp: Boolean(window.CQE),
+                homeTitle: document.querySelector('#home h1')?.textContent?.trim() || '',
+                domains: Array.isArray(window.CQE_DOMAINS) ? window.CQE_DOMAINS.length : 0,
+                lessons: Array.isArray(window.CQE_DOMAINS)
+                  ? window.CQE_DOMAINS.reduce((sum, domain) => sum + (domain.lessons?.length || 0), 0)
+                  : 0,
+                stillLoading: document.querySelector('#home')?.textContent?.includes('Loading course content') || false
+              }));
+
+              console.log(JSON.stringify(result, null, 2));
+
+              if (browserErrors.length) throw new Error(`Browser errors:\n${browserErrors.join('\n\n')}`);
+              if (requestFailures.length) throw new Error(`Request failures:\n${requestFailures.join('\n')}`);
+              if (!result.hasApp || result.stillLoading) throw new Error('CQE application did not replace the loading screen');
+              if (result.domains !== 7 || result.lessons !== 82) {
+                throw new Error(`Unexpected course data: ${result.domains} domains, ${result.lessons} lessons`);
+              }
+            } finally {
+              await browser.close();
+            }
+          })().catch(error => {
+            console.error(error.stack || error.message);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Upload browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cqe-browser-report
+          path: /tmp/cqe-browser-report.txt
+          if-no-files-found: warn
+          retention-days: 1
