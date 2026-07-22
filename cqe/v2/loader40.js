@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "20260722-1";
+  const VERSION = "20260722-2";
   const EXPECTED_CHUNKS = 40;
   const chunkFiles = [
     "c00.js", "c01.js", "c02.js", "c03.js", "c04.js", "c05.js",
@@ -11,10 +11,20 @@
   ];
 
   const home = document.getElementById("home");
+  let stage = "initializing";
 
   function setStatus(message) {
     if (!home) return;
     home.innerHTML = `<div class="notice">${message}</div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
   function loadScript(file, forceRefresh = false) {
@@ -36,9 +46,11 @@
   }
 
   async function loadChunks(forceRefresh = false) {
+    stage = "loading chunk files";
     window.CQE_CHUNKS = [];
     await Promise.all(chunkFiles.map(file => loadScript(file, forceRefresh)));
 
+    stage = "validating 40 chunks";
     const missing = [];
     for (let index = 0; index < EXPECTED_CHUNKS; index += 1) {
       if (typeof window.CQE_CHUNKS[index] !== "string" || window.CQE_CHUNKS[index].length === 0) {
@@ -52,17 +64,20 @@
   }
 
   function decodeBase64(base64) {
+    stage = "decoding base64 payload";
     const normalized = base64.replace(/\s+/g, "");
-    if (!normalized || normalized.length % 4 !== 0) {
-      throw new Error("Invalid CQE payload length");
-    }
+    if (!normalized) throw new Error("CQE payload is empty");
 
-    const binary = atob(normalized);
-    const bytes = new Uint8Array(binary.length);
-    for (let index = 0; index < binary.length; index += 1) {
-      bytes[index] = binary.charCodeAt(index);
+    try {
+      const binary = atob(normalized);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+      }
+      return bytes;
+    } catch (error) {
+      throw new Error(`Invalid CQE base64 payload (${normalized.length} chars): ${error.message}`);
     }
-    return bytes;
   }
 
   function loadPako() {
@@ -81,6 +96,7 @@
   }
 
   async function decompress(bytes) {
+    stage = "decompressing course payload";
     if ("DecompressionStream" in window) {
       const stream = new Blob([bytes])
         .stream()
@@ -96,15 +112,18 @@
     setStatus("جارٍ تحميل محتوى الدورة…<br>Loading course content…");
     await loadChunks(forceRefresh);
 
+    stage = "joining payload";
     const packed = window.CQE_CHUNKS.join("");
     const bytes = decodeBase64(packed);
     const code = await decompress(bytes);
 
     if (!code || code.length < 100) {
-      throw new Error("CQE course payload is empty");
+      throw new Error("CQE course payload is empty after decompression");
     }
 
+    stage = "starting course application";
     (0, eval)(`${code}\n//# sourceURL=cqe-course-app.js`);
+    stage = "complete";
   }
 
   async function boot() {
@@ -116,9 +135,11 @@
         await start(true);
       } catch (finalError) {
         console.error("CQE course failed to load.", finalError);
+        const detail = `${stage}: ${finalError?.name || "Error"}: ${finalError?.message || finalError}`;
         setStatus(
-          "تعذر تحميل الدورة مؤقتًا. اضغط الزر لإعادة المحاولة.<br>" +
-          "The course could not be loaded temporarily.<br><br>" +
+          "تعذر تحميل الدورة، وتم تسجيل سبب الخطأ أدناه.<br>" +
+          "The course could not be loaded.<br><br>" +
+          `<code style=\"display:block;direction:ltr;text-align:left;white-space:pre-wrap;padding:10px;background:#fff;border:1px solid #d6a847;border-radius:8px\">${escapeHtml(detail)}</code><br>` +
           "<button type=\"button\" class=\"primary\" id=\"cqeRetryButton\">إعادة التحميل / Retry</button>"
         );
 
