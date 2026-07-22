@@ -39,10 +39,12 @@ jobs:
               'p12.js','p14.js','q16.js','q20.js','q24.js','q28.js',
               'q32.js','q36.js','c37.js','c38.js','c39.js'
           ]
-          diagnostic = {'status': 'FAILED'}
+
+          chunks = {}
+          file_map = {}
+          diagnostic = {'status': 'FAILED', 'attempts': []}
 
           try:
-              chunks = {}
               pattern = re.compile(r'window\.CQE_CHUNKS\[(\d+)\]="([A-Za-z0-9+/=]+)";')
               for name in files:
                   text = (source_dir / name).read_text(encoding='utf-8')
@@ -52,68 +54,100 @@ jobs:
                   for index, value in matches:
                       index = int(index)
                       if index in chunks:
-                          raise RuntimeError(f'Duplicate CQE chunk {index} in {name}')
+                          raise RuntimeError(f'Duplicate CQE chunk {index} in {name} and {file_map[index]}')
                       chunks[index] = value
+                      file_map[index] = name
 
-              missing = [i for i in range(40) if i not in chunks]
-              extra = sorted(i for i in chunks if i not in range(40))
-              if missing or extra:
-                  raise RuntimeError(f'Missing chunks={missing}; extra chunks={extra}')
+              diagnostic['chunk_meta'] = [
+                  {
+                      'index': i,
+                      'file': file_map.get(i),
+                      'length': len(chunks[i]) if i in chunks else None,
+                      'mod4': len(chunks[i]) % 4 if i in chunks else None,
+                      'equals_count': chunks[i].count('=') if i in chunks else None,
+                      'first_equals': chunks[i].find('=') if i in chunks else None,
+                      'suffix': chunks[i][-16:] if i in chunks else None,
+                  }
+                  for i in range(40)
+              ]
 
-              compressed_parts = []
-              chunk_meta = []
-              for index in range(40):
-                  value = chunks[index]
+              candidates = {
+                  'legacy_0_36': ''.join(chunks[i] for i in range(37) if i in chunks),
+                  'all_0_39': ''.join(chunks[i] for i in range(40) if i in chunks),
+                  '0_35_plus_37_39': ''.join(chunks[i] for i in list(range(36)) + [37,38,39] if i in chunks),
+              }
+
+              success = None
+              success_code = None
+
+              def attempt(name, packed, strip_mid_padding=False):
+                  record = {
+                      'name': name,
+                      'characters': len(packed),
+                      'mod4': len(packed) % 4,
+                      'equals_count': packed.count('='),
+                      'first_equals': packed.find('='),
+                  }
                   try:
-                      decoded = base64.b64decode(value, validate=True)
+                      data = packed
+                      if strip_mid_padding:
+                          data = data.replace('=', '')
+                          data += '=' * ((4 - len(data) % 4) % 4)
+                      compressed = base64.b64decode(data, validate=True)
+                      record['compressed_bytes'] = len(compressed)
+                      code_bytes = gzip.decompress(compressed)
+                      code = code_bytes.decode('utf-8')
+                      temp = source_dir / '_candidate-check.js'
+                      temp.write_text(code, encoding='utf-8')
+                      subprocess.run(['node', '--check', str(temp)], check=True, capture_output=True, text=True)
+                      temp.unlink(missing_ok=True)
+                      record['status'] = 'SUCCESS'
+                      record['javascript_bytes'] = len(code_bytes)
+                      return record, code
                   except Exception as exc:
-                      raise RuntimeError(
-                          f'Chunk {index} is invalid base64: length={len(value)}, '
-                          f'mod4={len(value) % 4}, suffix={value[-12:]!r}, error={exc}'
-                      ) from exc
-                  compressed_parts.append(decoded)
-                  chunk_meta.append({'index': index, 'base64_length': len(value), 'bytes': len(decoded)})
+                      record['status'] = 'FAILED'
+                      record['error_type'] = type(exc).__name__
+                      record['error'] = str(exc)
+                      return record, None
 
-              compressed = b''.join(compressed_parts)
-              code_bytes = gzip.decompress(compressed)
-              code = code_bytes.decode('utf-8')
+              for name, packed in candidates.items():
+                  for strip in (False, True):
+                      label = name + ('_strip_padding' if strip else '')
+                      record, code = attempt(label, packed, strip)
+                      diagnostic['attempts'].append(record)
+                      if code is not None and success is None:
+                          success = label
+                          success_code = code
+
+              if success_code is None:
+                  raise RuntimeError('No reconstruction candidate produced valid JavaScript')
 
               output = source_dir / 'app-unpacked.js'
-              output.write_text(code + '\n//# sourceURL=cqe-course-app.js\n', encoding='utf-8')
-
-              subprocess.run(['node', '--check', str(output)], check=True)
+              output.write_text(success_code + '\n//# sourceURL=cqe-course-app.js\n', encoding='utf-8')
 
               index_path = root / 'cqe' / 'index.html'
               html = index_path.read_text(encoding='utf-8')
               html = re.sub(
                   r'<script src="v2/loader40\.js\?v=[^"]+"></script>',
-                  '<script src="v2/app-unpacked.js?v=20260722-5"></script>',
+                  '<script src="v2/app-unpacked.js?v=20260722-6"></script>',
                   html
               )
               html = re.sub(
                   r'<script src="v2/app-unpacked\.js\?v=[^"]+"></script>',
-                  '<script src="v2/app-unpacked.js?v=20260722-5"></script>',
+                  '<script src="v2/app-unpacked.js?v=20260722-6"></script>',
                   html
               )
-              html = re.sub(r'v2/styles\.css\?v=[^"]+', 'v2/styles.css?v=20260722-5', html)
+              html = re.sub(r'v2/styles\.css\?v=[^"]+', 'v2/styles.css?v=20260722-6', html)
               index_path.write_text(html, encoding='utf-8')
 
-              diagnostic = {
-                  'status': 'SUCCESS',
-                  'chunks': len(chunks),
-                  'base64_characters': sum(len(chunks[i]) for i in range(40)),
-                  'compressed_bytes': len(compressed),
-                  'javascript_bytes': len(code_bytes),
-                  'output': str(output),
-                  'chunk_meta': chunk_meta,
-              }
+              diagnostic['status'] = 'SUCCESS'
+              diagnostic['selected_candidate'] = success
+              diagnostic['output'] = str(output)
           except Exception as exc:
-              diagnostic = {
-                  'status': 'FAILED',
-                  'error_type': type(exc).__name__,
-                  'error': str(exc),
-                  'traceback': traceback.format_exc(),
-              }
+              diagnostic['status'] = 'FAILED'
+              diagnostic['error_type'] = type(exc).__name__
+              diagnostic['error'] = str(exc)
+              diagnostic['traceback'] = traceback.format_exc()
 
           (root / 'cqe' / 'unpack-diagnostic.json').write_text(
               json.dumps(diagnostic, ensure_ascii=False, indent=2),
