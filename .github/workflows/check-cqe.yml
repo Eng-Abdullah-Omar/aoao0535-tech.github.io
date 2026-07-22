@@ -5,6 +5,7 @@ on:
     paths:
       - "cqe/**"
       - ".github/workflows/check-cqe.yml"
+      - ".github/workflows/unpack-cqe.yml"
 
 permissions:
   contents: read
@@ -20,6 +21,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: Apply CQE runtime repair for validation
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path('cqe/v2/app-unpacked.js')
+          code = path.read_text(encoding='utf-8')
+          replacements = [
+              ("method:['ادرس الوحدة", "methodSteps:['ادرس الوحدة"),
+              ("method:['Study each unit", "methodSteps:['Study each unit"),
+              ("u('method').map", "u('methodSteps').map"),
+          ]
+
+          for old, new in replacements:
+              if old in code:
+                  code = code.replace(old, new, 1)
+              if new not in code:
+                  raise RuntimeError(f'CQE runtime repair marker is missing: {new!r}')
+
+          path.write_text(code, encoding='utf-8')
+          PY
 
       - name: Check JavaScript syntax
         run: node --check cqe/v2/app-unpacked.js
