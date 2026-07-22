@@ -1,6 +1,6 @@
 {
   "status": "FAILED",
-  "error_type": "Error",
-  "error": "Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4",
-  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 39, in <module>\n  File \"/usr/lib/python3.12/base64.py\", line 88, in b64decode\n    return binascii.a2b_base64(s, strict_mode=validate)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nbinascii.Error: Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4\n"
+  "error_type": "RuntimeError",
+  "error": "Chunk 0 is invalid base64: length=3057, mod4=1, suffix='WxCFCb47WI2z', error=Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4",
+  "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 44, in <module>\n  File \"/usr/lib/python3.12/base64.py\", line 88, in b64decode\n    return binascii.a2b_base64(s, strict_mode=validate)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nbinascii.Error: Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"<stdin>\", line 46, in <module>\nRuntimeError: Chunk 0 is invalid base64: length=3057, mod4=1, suffix='WxCFCb47WI2z', error=Invalid base64-encoded string: number of data characters (3057) cannot be 1 more than a multiple of 4\n"
 }
