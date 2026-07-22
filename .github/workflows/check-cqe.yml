@@ -1,0 +1,52 @@
+name: Check CQE course
+
+on:
+  pull_request:
+    paths:
+      - "cqe/**"
+      - ".github/workflows/check-cqe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check JavaScript syntax
+        run: node --check cqe/v2/app-unpacked.js
+
+      - name: Validate CQE data payload
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const vm = require('node:vm');
+
+          const path = 'cqe/v2/app-unpacked.js';
+          const code = fs.readFileSync(path, 'utf8');
+          const marker = code.indexOf('\n(() => {');
+          if (marker < 0) throw new Error('CQE application marker was not found');
+
+          const context = { window: {} };
+          vm.createContext(context);
+          vm.runInContext(code.slice(0, marker), context, { filename: path });
+
+          const domains = context.window.CQE_DOMAINS;
+          const meta = context.window.CQE_META;
+          if (!meta || !Array.isArray(domains)) throw new Error('CQE metadata did not initialize');
+          if (domains.length !== 7) throw new Error(`Expected 7 domains, found ${domains.length}`);
+
+          const lessons = domains.reduce((sum, domain) => sum + (domain.lessons?.length || 0), 0);
+          if (lessons !== 82) throw new Error(`Expected 82 lessons, found ${lessons}`);
+
+          console.log(`Validated ${domains.length} domains and ${lessons} lessons.`);
+          NODE
